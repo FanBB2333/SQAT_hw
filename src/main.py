@@ -19,16 +19,19 @@ class User:
         self.uid: int = 0  # the number of id
         self.name: str = ""  # personal unique name
         self.intro: str = ""  # brief introduction
+        self.follows: int = 0  # the number of follows
+        self.fans: int = 0  # the number of fans
         self.auth_up: bool = False
         self.auth_org: bool = False
 
 
-def find_auth_fans(uid: int) -> List[int]:
+def find_auth_follows(uid: int) -> List[int]:
     """
+    find the authenticated users among the user's follows
     :param uid: the uid of the source user
-    :return: the authenticated uid list in the fans list
+    :return: the authenticated uid list in the follow list
     """
-    url = "https://space.bilibili.com/{}/fans/fans".format(uid)
+    url = "https://space.bilibili.com/{}/fans/follow".format(uid)
     wd = webdriver.Chrome(options=_options)
 
     wd.get(url)
@@ -46,7 +49,7 @@ uid_source: int = 208259  # 陈睿
 
 
 if __name__ == "__main__":
-    i = find_auth_fans(uid_source)
+    i = find_auth_follows(uid_source)
 
 
 
