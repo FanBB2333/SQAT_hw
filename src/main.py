@@ -35,8 +35,15 @@ def find_auth_follows(uid: int) -> List[int]:
     wd = webdriver.Chrome(options=_options)
 
     wd.get(url)
+    # wd.find_element(by="class name", value="be-pager-total")
+    print(wd.find_element(by="class name", value="be-pager-total").text)
+    print(wd.find_element(by="class name", value="auth-description").text)
+
+    wd.find_element(by="class name", value="be-pager-next").click()
     # print(wd.page_source)
     soup = BeautifulSoup(wd.page_source, "html.parser")
+    with open('1.html', 'w') as file_object:
+        file_object.write(soup.prettify())
     print(soup.prettify())
 
     _ret = []
