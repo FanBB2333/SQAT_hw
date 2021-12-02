@@ -36,7 +36,9 @@ def find_auth_follows(uid: int) -> List[int]:
 
     wd.get(url)
     # wd.find_element(by="class name", value="be-pager-total")
-    print(wd.find_element(by="class name", value="be-pager-total").text)
+    all_users = wd.find_elements(by="class name", value="list-item")  # find all of the users
+    total_pages = int(re.search('[0-9]+', wd.find_element(by="class name", value="be-pager-total").text).group())
+    print("total pages: {}".format(total_pages))
     print(wd.find_element(by="class name", value="auth-description").text)
 
     wd.find_element(by="class name", value="be-pager-next").click()
