@@ -13,18 +13,6 @@ _options = Options()
 _options.add_argument('--headless')
 
 
-class User:
-
-    def __init__(self):
-        self.uid: int = 0  # the number of id
-        self.name: str = ""  # personal unique name
-        self.intro: str = ""  # brief introduction
-        self.follows: int = 0  # the number of follows
-        self.fans: int = 0  # the number of fans
-        self.auth_up: bool = False
-        self.auth_org: bool = False
-
-
 def find_auth_follows(uid: int) -> List[int]:
     """
     find the authenticated users among the user's follows
@@ -36,7 +24,7 @@ def find_auth_follows(uid: int) -> List[int]:
     wd = webdriver.Chrome()
 
     wd.get(url)
-    time.sleep(0.5)
+    time.sleep(1)
     # wd.find_element(by="class name", value="be-pager-total")
     total_pages = int(re.search('[0-9]+', wd.find_element(by="class name", value="be-pager-total").text).group())  # get the total pages
     print("total pages: {}".format(total_pages))
@@ -52,15 +40,12 @@ def find_auth_follows(uid: int) -> List[int]:
             _ret.extend([i for i in auth_users_id])
             print([i.text for i in auth_users])
             wd.find_element(by="class name", value="be-pager-next").click()  # click the next page
-            time.sleep(1)
+            time.sleep(0.3)
         except Exception as e:
             print("error in uid: {} and page: {}".format(uid, page_idx))
             # print(e)
             break
 
-    # print(wd.find_element(by="class name", value="auth-description").text)
-    # wd.quit()
-    # print(wd.page_source)
     soup = BeautifulSoup(wd.page_source, "html.parser")
     with open('1.html', 'w') as file_object:
         file_object.write(soup.prettify())
@@ -76,9 +61,44 @@ uid_source: int = 946974  # 影视飓风
 # uid_source: int = 12590  # epcdiy
 
 
+
+class User:
+
+    def __init__(self, uid: int):
+        self.uid: int = uid  # the number of id
+        self.name: str = ""  # personal unique name
+        self.intro: str = ""  # brief introduction
+        self.follows: int = 0  # the number of follows
+        self.fans: int = 0  # the number of fans
+        self.auth_up: bool = False
+        self.auth_org: bool = False
+        self.auth_follows: List[int] = find_auth_follows(uid)  # the list of authenticated users among the user's follows
+
+    def __eq__(self, other):
+        return self.uid == other.uid
+
 if __name__ == "__main__":
-    auth_follow_list = find_auth_follows(uid_source)
-    print(auth_follow_list)
+    all_users: List[User] = []
+    added_users = {}
+    all_users.append(User(uid_source))
+    added_users[uid_source] = True
+
+    iteration = 5
+    for i in range(iteration):
+        print("iteration: {}. There are {} users in total.".format(i, len(all_users)))
+        to_be_extend = []
+        # collect the authed users to be extended
+        for u in all_users:
+            to_be_extend.extend(u.auth_follows)
+        print("to be extended: {}".format(to_be_extend))
+        for uid in to_be_extend:
+            if uid not in added_users:
+                all_users.append(User(uid))
+                added_users[uid] = True
+
+    print("At last there are {} users in total.".format(len(all_users)))
+
+
 
 
 
