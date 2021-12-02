@@ -47,7 +47,8 @@ def find_auth_follows(uid: int) -> List[int]:
             auth_users = wd.find_elements(by="xpath", value="//li[@class='list-item clearfix']/div[@class='content']/p[@class='auth-description']/../a[@class='title']/span")
             auth_users_href = wd.find_elements(by="xpath", value="//li[@class='list-item clearfix']/div[@class='content']/p[@class='auth-description']/../a[@class='title']")
             auth_users_id = [int(re.search('[0-9]+', auth_users_href[i].get_attribute("href")).group()) for i in range(len(auth_users_href))]
-            print([i.text for i in auth_users])
+            _ret.extend([i for i in auth_users_id])
+            # print([i.text for i in auth_users])
             wd.find_element(by="class name", value="be-pager-next").click()  # click the next page
             time.sleep(0.1)
         except Exception as e:
@@ -73,7 +74,8 @@ uid_source: int = 208259  # 陈睿
 
 
 if __name__ == "__main__":
-    i = find_auth_follows(uid_source)
+    auth_follow_list = find_auth_follows(uid_source)
+    print(auth_follow_list)
 
 
 
