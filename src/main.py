@@ -36,17 +36,24 @@ def find_auth_follows(uid: int) -> List[int]:
 
     wd.get(url)
     # wd.find_element(by="class name", value="be-pager-total")
-    all_users = wd.find_elements(by="class name", value="list-item")  # find all of the users
-    total_pages = int(re.search('[0-9]+', wd.find_element(by="class name", value="be-pager-total").text).group())
+    total_pages = int(re.search('[0-9]+', wd.find_element(by="class name", value="be-pager-total").text).group())  # get the total pages
     print("total pages: {}".format(total_pages))
-    print(wd.find_element(by="class name", value="auth-description").text)
 
-    wd.find_element(by="class name", value="be-pager-next").click()
+    # all_users = wd.find_elements(by="class name", value="list-item")  # find all of the users
+    # all_users = wd.find_elements(by="xpath", value="//li[@class='list-item']/div/p/a[@class='auth-description']")
+    auth_users = wd.find_elements(by="xpath", value="//li[@class='list-item clearfix']/div[@class='content']/p[@class='auth-description']/../a[@class='title']/span")
+    auth_users_href = wd.find_elements(by="xpath", value="//li[@class='list-item clearfix']/div[@class='content']/p[@class='auth-description']/../a[@class='title']")
+    auth_users_id = [int(re.search('[0-9]+', auth_users_href[i].get_attribute("href")).group()) for i in range(len(auth_users_href))]
+    a=1
+    print([i.text for i in auth_users])
+
+    # print(wd.find_element(by="class name", value="auth-description").text)
+
+    wd.find_element(by="class name", value="be-pager-next").click()  # click the next page
     # print(wd.page_source)
     soup = BeautifulSoup(wd.page_source, "html.parser")
     with open('1.html', 'w') as file_object:
         file_object.write(soup.prettify())
-    print(soup.prettify())
 
     _ret = []
 
