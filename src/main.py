@@ -51,6 +51,7 @@ def find_auth_follows(uid: int) -> List[int]:
             wd.find_element(by="class name", value="be-pager-next").click()  # click the next page
             time.sleep(0.1)
         except Exception as e:
+            print("error in uid: {} and page: {}".format(uid, page_idx))
             print(e)
             break
 
