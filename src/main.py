@@ -20,31 +20,38 @@ def find_auth_follows(uid: int) -> List[int]:
     :return: the authenticated uid list in the follow list
     """
     url = "https://space.bilibili.com/{}/fans/follow".format(uid)
-    # wd = webdriver.Chrome(options=_options)
-    wd = webdriver.Chrome()
+    wd = webdriver.Chrome(options=_options)
+    # wd = webdriver.Chrome()
 
     wd.get(url)
-    time.sleep(1)
-    # wd.find_element(by="class name", value="be-pager-total")
-    total_pages = int(re.search('[0-9]+', wd.find_element(by="class name", value="be-pager-total").text).group())  # get the total pages
+    time.sleep(2)
+    try:
+        total_pages = int(re.search('[0-9]+', wd.find_element(by="class name", value="be-pager-total").text).group())  # get the total pages
+    except Exception as e:
+        print("由于该用户隐私设置，关注列表不可见")
+        # print(e)
+        return []
+
     print("total pages: {}".format(total_pages))
 
     _ret = []
 
     for page_idx in range(min(total_pages, 5)):
-        print("page: {}".format(page_idx))
+        print("page: {}".format(page_idx+1))
         try:
             auth_users = wd.find_elements(by="xpath", value="//li[@class='list-item clearfix']/div[@class='content']/p[@class='auth-description']/../a[@class='title']/span")
             auth_users_href = wd.find_elements(by="xpath", value="//li[@class='list-item clearfix']/div[@class='content']/p[@class='auth-description']/../a[@class='title']")
             auth_users_id = [int(re.search('[0-9]+', auth_users_href[i].get_attribute("href")).group()) for i in range(len(auth_users_href))]
             _ret.extend([i for i in auth_users_id])
             print([i.text for i in auth_users])
-            wd.find_element(by="class name", value="be-pager-next").click()  # click the next page
+            # the last page does not need to go to next one
+            if page_idx != total_pages-1:
+                wd.find_element(by="class name", value="be-pager-next").click()  # click the next page
             time.sleep(0.3)
         except Exception as e:
             print("error in uid: {} and page: {}".format(uid, page_idx))
-            # print(e)
-            break
+            print(e)
+            # break
 
     soup = BeautifulSoup(wd.page_source, "html.parser")
     with open('1.html', 'w') as file_object:
@@ -60,7 +67,7 @@ def find_auth_follows(uid: int) -> List[int]:
 uid_source: int = 946974  # 影视飓风
 # uid_source: int = 12590  # epcdiy
 
-
+uid_source = 6330633
 
 class User:
 
@@ -78,6 +85,7 @@ class User:
         return self.uid == other.uid
 
 if __name__ == "__main__":
+    # find_auth_follows(uid_source)
     all_users: List[User] = []
     added_users = {}
     all_users.append(User(uid_source))
