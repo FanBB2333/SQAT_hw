@@ -125,7 +125,7 @@ class User:
 
 
 def write_to_csv(users: List[User]):
-    with open(output_file, 'w', encoding='utf-8', newline='') as csvfile:
+    with open(output_file, 'w', newline='') as csvfile:
         fieldnames = ['uid', 'id', '简介', '关注', '粉丝', '投稿数', '代表投稿']
         writer = csv.writer(csvfile)
         writer.writerow(fieldnames)
