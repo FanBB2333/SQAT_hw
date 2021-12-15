@@ -84,6 +84,7 @@ class User:
         self.contributions: str = 0  # the number of contributions
         self.top_playlist: List[str] = []  # the list of play list
         self.auth_follows: List[int] = find_auth_follows(uid)  # the list of authenticated users among the user's follows
+        self.valid: bool = True  # whether the user is valid
         # TODO: complete the other attributes
         url_main = "https://space.bilibili.com/{}".format(uid)
         wd = webdriver.Chrome(options=_options)
@@ -91,18 +92,27 @@ class User:
 
         wd.get(url_main)
         time.sleep(1)
-        self.name = wd.find_element(by="xpath", value="/html/body/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div[1]/span[1]").text
-        self.intro = wd.find_element(by="xpath", value="/html/body/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div[2]/h4").text
-        self.follows = wd.find_element(by="xpath", value="/html/body/div[2]/div[2]/div/div[1]/div[3]/a[1]/p[2]").text
-        self.fans = wd.find_element(by="xpath", value="/html/body/div[2]/div[2]/div/div[1]/div[3]/a[2]/p[2]").text
+        try:
+            self.name = wd.find_element(by="xpath",
+                                        value="/html/body/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div[1]/span[1]").text
+            self.intro = wd.find_element(by="xpath",
+                                         value="/html/body/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div[2]/h4").text
+            self.follows = wd.find_element(by="xpath",
+                                           value="/html/body/div[2]/div[2]/div/div[1]/div[3]/a[1]/p[2]").text
+            self.fans = wd.find_element(by="xpath", value="/html/body/div[2]/div[2]/div/div[1]/div[3]/a[2]/p[2]").text
 
-        url_contributions = "https://space.bilibili.com/{}/video".format(uid)
-        wd.get(url_contributions)
-        time.sleep(1)
-        self.contributions = wd.find_element(by="xpath", value="/html/body/div[2]/div[2]/div/div[1]/div[1]/a[3]/span[3]").text
-        for idx in range(1, 6):
-            video_xpath = "/html/body/div[2]/div[4]/div/div/div[2]/div[4]/div/div/ul[2]/li[{}]/a[2]".format(idx)
-            self.top_playlist.append(wd.find_element(by="xpath", value=video_xpath).text)
+            url_contributions = "https://space.bilibili.com/{}/video".format(uid)
+            wd.get(url_contributions)
+            time.sleep(1)
+            self.contributions = wd.find_element(by="xpath",
+                                                 value="/html/body/div[2]/div[2]/div/div[1]/div[1]/a[3]/span[3]").text
+            for idx in range(1, 6):
+                video_xpath = "/html/body/div[2]/div[4]/div/div/div[2]/div[4]/div/div/ul[2]/li[{}]/a[2]".format(idx)
+                self.top_playlist.append(wd.find_element(by="xpath", value=video_xpath).text)
+        except Exception as e:
+            self.valid = False
+
+
 
         soup = BeautifulSoup(wd.page_source, "html.parser")
         with open('1.html', 'w') as file_object:
@@ -114,7 +124,7 @@ class User:
 
 
 def write_to_csv(users: List[User]):
-    with open(output_file, 'a', newline='') as csvfile:
+    with open(output_file, 'w', encoding='utf-8', newline='') as csvfile:
         fieldnames = ['uid', 'id', '简介', '关注', '粉丝', '投稿数', '代表投稿']
         writer = csv.writer(csvfile)
         writer.writerow(fieldnames)
@@ -124,7 +134,6 @@ def write_to_csv(users: List[User]):
 
 if __name__ == "__main__":
 
-    a = User(uid_source)
     # sys.exit(0)
 
     # find_auth_follows(uid_source)
