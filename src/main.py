@@ -9,6 +9,7 @@ from selenium import webdriver
 import time
 import os
 import sys
+import time
 
 from selenium.webdriver.chrome.options import Options
 _options = Options()
@@ -133,16 +134,14 @@ def write_to_csv(users: List[User]):
 
 
 if __name__ == "__main__":
-
-    # sys.exit(0)
-
+    start_time = time.time()
     # find_auth_follows(uid_source)
     all_users: List[User] = []
     added_users = {}
     all_users.append(User(uid_source))
     added_users[uid_source] = True
 
-    iteration = 1
+    iteration = 2
     for i in range(iteration):
         print("iteration: {}. There are {} users in total.".format(i, len(all_users)))
         to_be_extend = []
@@ -157,6 +156,8 @@ if __name__ == "__main__":
 
     print("At last there are {} users in total.".format(len(all_users)))
     write_to_csv(all_users)
+    end_time = time.time()
+    print('Time cost: {}' .format(end_time - start_time) )
 
 
 
