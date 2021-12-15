@@ -6,7 +6,7 @@ import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
-
+import os
 
 from selenium.webdriver.chrome.options import Options
 _options = Options()
@@ -53,9 +53,9 @@ def find_auth_follows(uid: int) -> List[int]:
             print(e)
             # break
 
-    soup = BeautifulSoup(wd.page_source, "html.parser")
-    with open('1.html', 'w') as file_object:
-        file_object.write(soup.prettify())
+    # soup = BeautifulSoup(wd.page_source, "html.parser")
+    # with open('1.html', 'w') as file_object:
+    #     file_object.write(soup.prettify())
     print("Found {} auth users from {}".format(len(_ret), uid))
 
 
@@ -81,11 +81,25 @@ class User:
         self.auth_org: bool = False
         self.auth_follows: List[int] = find_auth_follows(uid)  # the list of authenticated users among the user's follows
         # TODO: complete the other attributes
+        url_main = "https://space.bilibili.com/{}".format(uid)
+        wd = webdriver.Chrome(options=_options)
+        # wd = webdriver.Chrome()
+
+        wd.get(url_main)
+        time.sleep(2)
+        soup = BeautifulSoup(wd.page_source, "html.parser")
+        with open('1.html', 'w') as file_object:
+            file_object.write(soup.prettify())
+
 
     def __eq__(self, other):
         return self.uid == other.uid
 
 if __name__ == "__main__":
+
+    a = User(uid_source)
+    os.exit()
+
     # find_auth_follows(uid_source)
     all_users: List[User] = []
     added_users = {}
