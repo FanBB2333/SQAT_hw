@@ -116,8 +116,8 @@ class User:
 
 
         soup = BeautifulSoup(wd.page_source, "html.parser")
-        with open('1.html', 'w') as file_object:
-            file_object.write(soup.prettify())
+        # with open('1.html', 'w') as file_object:
+        #     file_object.write(soup.prettify())
 
 
     def __eq__(self, other):
