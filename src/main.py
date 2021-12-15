@@ -80,6 +80,7 @@ class User:
         self.auth_up: bool = False
         self.auth_org: bool = False
         self.auth_follows: List[int] = find_auth_follows(uid)  # the list of authenticated users among the user's follows
+        # TODO: complete the other attributes
 
     def __eq__(self, other):
         return self.uid == other.uid
