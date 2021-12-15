@@ -1,3 +1,4 @@
+import csv
 from typing import List
 
 import requests
@@ -70,6 +71,7 @@ uid_source: int = 946974  # 影视飓风
 
 # uid_source = 6330633
 
+output_file = "attach_6.csv"
 
 class User:
 
@@ -81,13 +83,11 @@ class User:
         self.fans: str = 0  # the number of fans
         self.contributions: str = 0  # the number of contributions
         self.top_playlist: List[str] = []  # the list of play list
-        self.auth_up: bool = False
-        self.auth_org: bool = False
         self.auth_follows: List[int] = find_auth_follows(uid)  # the list of authenticated users among the user's follows
         # TODO: complete the other attributes
         url_main = "https://space.bilibili.com/{}".format(uid)
-        # wd = webdriver.Chrome(options=_options)
-        wd = webdriver.Chrome()
+        wd = webdriver.Chrome(options=_options)
+        # wd = webdriver.Chrome()
 
         wd.get(url_main)
         time.sleep(1)
@@ -112,10 +112,20 @@ class User:
     def __eq__(self, other):
         return self.uid == other.uid
 
+
+def write_to_csv(users: List[User]):
+    with open(output_file, 'a', newline='') as csvfile:
+        fieldnames = ['uid', 'id', '简介', '关注', '粉丝', '投稿数', '代表投稿']
+        writer = csv.writer(csvfile)
+        writer.writerow(fieldnames)
+        for user in users:
+            writer.writerow([user.uid, user.name, user.intro, user.follows, user.fans, user.contributions, user.top_playlist])
+
+
 if __name__ == "__main__":
 
     a = User(uid_source)
-    sys.exit(0)
+    # sys.exit(0)
 
     # find_auth_follows(uid_source)
     all_users: List[User] = []
@@ -123,7 +133,7 @@ if __name__ == "__main__":
     all_users.append(User(uid_source))
     added_users[uid_source] = True
 
-    iteration = 5
+    iteration = 1
     for i in range(iteration):
         print("iteration: {}. There are {} users in total.".format(i, len(all_users)))
         to_be_extend = []
@@ -137,6 +147,7 @@ if __name__ == "__main__":
                 added_users[uid] = True
 
     print("At last there are {} users in total.".format(len(all_users)))
+    write_to_csv(all_users)
 
 
 
