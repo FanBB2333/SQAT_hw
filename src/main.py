@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
 import os
+import sys
 
 from selenium.webdriver.chrome.options import Options
 _options = Options()
@@ -67,7 +68,8 @@ def find_auth_follows(uid: int) -> List[int]:
 uid_source: int = 946974  # 影视飓风
 # uid_source: int = 12590  # epcdiy
 
-uid_source = 6330633
+# uid_source = 6330633
+
 
 class User:
 
@@ -75,18 +77,33 @@ class User:
         self.uid: int = uid  # the number of id
         self.name: str = ""  # personal unique name
         self.intro: str = ""  # brief introduction
-        self.follows: int = 0  # the number of follows
-        self.fans: int = 0  # the number of fans
+        self.follows: str = 0  # the number of follows
+        self.fans: str = 0  # the number of fans
+        self.contributions: str = 0  # the number of contributions
+        self.top_playlist: List[str] = []  # the list of play list
         self.auth_up: bool = False
         self.auth_org: bool = False
         self.auth_follows: List[int] = find_auth_follows(uid)  # the list of authenticated users among the user's follows
         # TODO: complete the other attributes
         url_main = "https://space.bilibili.com/{}".format(uid)
-        wd = webdriver.Chrome(options=_options)
-        # wd = webdriver.Chrome()
+        # wd = webdriver.Chrome(options=_options)
+        wd = webdriver.Chrome()
 
         wd.get(url_main)
-        time.sleep(2)
+        time.sleep(1)
+        self.name = wd.find_element(by="xpath", value="/html/body/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div[1]/span[1]").text
+        self.intro = wd.find_element(by="xpath", value="/html/body/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div[2]/h4").text
+        self.follows = wd.find_element(by="xpath", value="/html/body/div[2]/div[2]/div/div[1]/div[3]/a[1]/p[2]").text
+        self.fans = wd.find_element(by="xpath", value="/html/body/div[2]/div[2]/div/div[1]/div[3]/a[2]/p[2]").text
+
+        url_contributions = "https://space.bilibili.com/{}/video".format(uid)
+        wd.get(url_contributions)
+        time.sleep(1)
+        self.contributions = wd.find_element(by="xpath", value="/html/body/div[2]/div[2]/div/div[1]/div[1]/a[3]/span[3]").text
+        for idx in range(1, 6):
+            video_xpath = "/html/body/div[2]/div[4]/div/div/div[2]/div[4]/div/div/ul[2]/li[{}]/a[2]".format(idx)
+            self.top_playlist.append(wd.find_element(by="xpath", value=video_xpath).text)
+
         soup = BeautifulSoup(wd.page_source, "html.parser")
         with open('1.html', 'w') as file_object:
             file_object.write(soup.prettify())
@@ -98,7 +115,7 @@ class User:
 if __name__ == "__main__":
 
     a = User(uid_source)
-    os.exit()
+    sys.exit(0)
 
     # find_auth_follows(uid_source)
     all_users: List[User] = []
